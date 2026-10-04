@@ -19,12 +19,11 @@ def response(data, status_code=200):
         mimetype="application/json"
     )
 
-
-#def employee_from_row(row):
+def employee_from_row(row):
     if row is None:
         return None
 
-    return {
+    result = {
         "EmployeeID": row.EmployeeID,
         "FirstName": row.FirstName,
         "LastName": row.LastName,
@@ -35,28 +34,12 @@ def response(data, status_code=200):
         "Bonus": float(row.Bonus) if row.Bonus is not None else None,
         "HireDate": row.HireDate.isoformat() if row.HireDate else None
     }
-def employee_from_row(row):
-    if row is None:
-        return None
 
-    effective_bonus = (
-        float(row.Bonus)
-        if row.Bonus is not None
-        else float(row.Salary) * 0.05
-    )
+    # Apply the optional 5% default only when Bonus is NULL
+    if row.Bonus is None and row.Salary is not None:
+        result["EffectiveBonus"] = float(row.Salary) * 0.05
 
-    return {
-        "EmployeeID": row.EmployeeID,
-        "FirstName": row.FirstName,
-        "LastName": row.LastName,
-        "DepartmentID": row.DepartmentID,
-        "DepartmentName": row.DepartmentName,
-        "Location": row.Location,
-        "Salary": float(row.Salary) if row.Salary is not None else None,
-        "Bonus": float(row.Bonus) if row.Bonus is not None else None,
-        "EffectiveBonus": effective_bonus,
-        "HireDate": row.HireDate.isoformat() if row.HireDate else None
-    } 
+    return result
 def validate_money(value, field_name, required=False):
     if value is None:
         if required:
